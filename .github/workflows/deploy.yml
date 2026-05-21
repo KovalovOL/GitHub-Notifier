@@ -19,23 +19,19 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          port: ${{ secrets.SSH_PORT || 22 }}
+          port: 22
           script: |
-            # Navigate to /opt
             cd /opt
 
-            # Clone repository if it doesn't exist, otherwise pull latest changes
-            if [ ! -d "github-notifier-v2" ]; then
+            if [ ! -d "GitHub-Notifier" ]; then
               echo "Cloning repository..."
-              # Using HTTPS clone. If private repo, ensure server has access or use SSH
-              git clone https://github.com/${{ github.repository }}.git github-notifier-v2
-              cd github-notifier-v2
+              git clone https://github.com/KovalovOL/GitHub-Notifier.git
+              cd GitHub-Notifier
             else
               echo "Repository exists. Pulling latest changes..."
-              cd github-notifier-v2
+              cd GitHub-Notifier
               git pull origin main
             fi
 
-            # Build and start containers
             echo "Rebuilding and deploying containers..."
             docker compose up -d --build
