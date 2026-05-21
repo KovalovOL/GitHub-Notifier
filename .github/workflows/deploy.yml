@@ -15,12 +15,17 @@ jobs:
 
       - name: SSH and Deploy to VPC
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          ENV_FILE: ${{ secrets.ENV_FILE }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
           port: 22
+          envs: ENV_FILE
           script: |
+            set -e
+
             cd /opt
 
             if [ ! -d "GitHub-Notifier" ]; then
@@ -33,5 +38,10 @@ jobs:
               git pull origin main
             fi
 
+            # Create/Overwrite .env from the GitHub Secret
+            echo "Creating .env file..."
+            echo "$ENV_FILE" > .env
+
             echo "Rebuilding and deploying containers..."
             docker compose up -d --build
+
