@@ -1,0 +1,53 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: postgres_db
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: github_notifier_api
+    restart: always
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      DB_HOST: db
+    depends_on:
+      db:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      # Exposes the service under a configurable domain (defaults to notifier.localhost)
+      - "traefik.http.routers.ghnotifier.rule=Host(`gh-notifier.online`)"
+      - "traefik.http.routers.ghnotifier.entrypoints=websecure"
+      - "traefik.http.routers.ghnotifier.tls=true"
+      # Use your specific certificate resolver name here (e.g. letsencrypt)
+      - "traefik.http.routers.ghnotifier.tls.certresolver=myresolver"
+      # Tells Traefik which port of the container to route traffic to
+      - "traefik.http.services.ghnotifier.loadbalancer.server.port=8080"
+    networks:
+      - default
+      - traefik-public
+
+volumes:
+  postgres_data:
+
+networks:
+  traefik-public:
+    external: true

@@ -1,0 +1,41 @@
+name: CD Pipeline - Deploy to VPC
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: SSH and Deploy to VPC
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script: |
+            # Navigate to /opt
+            cd /opt
+
+            # Clone repository if it doesn't exist, otherwise pull latest changes
+            if [ ! -d "github-notifier-v2" ]; then
+              echo "Cloning repository..."
+              # Using HTTPS clone. If private repo, ensure server has access or use SSH
+              git clone https://github.com/${{ github.repository }}.git github-notifier-v2
+              cd github-notifier-v2
+            else
+              echo "Repository exists. Pulling latest changes..."
+              cd github-notifier-v2
+              git pull origin main
+            fi
+
+            # Build and start containers
+            echo "Rebuilding and deploying containers..."
+            docker compose up -d --build

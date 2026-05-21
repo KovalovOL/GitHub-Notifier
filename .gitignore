@@ -1,0 +1,6 @@
+.git/
+.vscode/
+.idea/
+.env
+.DS_Store
+app.log
