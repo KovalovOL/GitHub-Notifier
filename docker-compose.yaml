@@ -37,13 +37,13 @@ services:
         condition: service_healthy
     labels:
       - "traefik.enable=true"
-      # Exposes the service under a configurable domain (defaults to notifier.localhost)
+      - "traefik.docker.network=traefik-public"
+      
       - "traefik.http.routers.ghnotifier.rule=Host(`gh-notifier.online`)"
       - "traefik.http.routers.ghnotifier.entrypoints=websecure"
       - "traefik.http.routers.ghnotifier.tls=true"
-      # Use your specific certificate resolver name here (e.g. letsencrypt)
       - "traefik.http.routers.ghnotifier.tls.certresolver=myresolver"
-      # Tells Traefik which port of the container to route traffic to
+
       - "traefik.http.services.ghnotifier.loadbalancer.server.port=8080"
     networks:
       - default
