@@ -2,6 +2,9 @@
 
 A Go-based service that monitors GitHub repositories for new tag/version releases and automatically sends email notifications to subscribers. It runs a lightweight background scanner and exposes a clean REST API.
 
+## Swagger documentation
+You can find the Swagger documentation at: [https://gh-notifier.online/docs](https://gh-notifier.online/docs)
+
 ## Features
 
 - **Background Scanning**: Periodically polls the GitHub API for new tags.
@@ -77,9 +80,6 @@ go run cmd/api/main.go
 ---
 
 ## Example API Usage Flow
-
-### Swagger documentation
-You can find the Swagger documentation at: `https://gh-notifier.online/docs`
 
 ### 1. Request a subscription
 Subscribe a user email to track `KovalovOL/GitHub-Notifier`:
