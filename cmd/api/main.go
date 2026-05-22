@@ -15,6 +15,9 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
+
+	httpSwagger "github.com/swaggo/http-swagger"
+	_ "ghnotifier/docs"
 )
 
 func init() {
@@ -22,6 +25,17 @@ func init() {
 		log.Println("No .env file found, using system env")
 	}
 }
+
+// @title          GitHub Notifier API
+// @version        1.0
+// @description    GitHub Notifier is a service that monitors GitHub repositories and sends email notifications when new commits are pushed to the repositories.
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name   Oleksandr
+// @contact.email  [EMAIL_ADDRESS]
+
+// @host      localhost:8080
+// @BasePath  /api
 
 func main() {
 	config := config.NewConfig()
@@ -61,6 +75,12 @@ func main() {
 	r := chi.NewRouter()
 	r.Route("/api", func(r chi.Router) {
 		subHandler.RegisterRoutes(r)
+	})
+
+	r.Get("/swagger/*", httpSwagger.WrapHandler)
+
+	r.Get("/docs", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/swagger/index.html", http.StatusMovedPermanently)
 	})
 
 	log.Println("Starting server on :8080")

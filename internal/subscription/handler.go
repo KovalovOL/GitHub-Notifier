@@ -27,6 +27,20 @@ type SubscribeRequest struct {
 	RepoPath string `json:"repo"`
 }
 
+type ErrorResponse struct {
+	Error string `json:"error"`
+}
+
+// Subscribe godoc
+// @Summary      Subscribe to repository updates
+// @Description  Subscribes a user to receive email notifications for new commits in a specific GitHub repository.
+// @Tags         subscription
+// @Produce      text/plain
+// @Param        SubscribeRequest body SubscribeRequest true "Subscription request"
+// @Success      201  {object}  string
+// @Failure      400  {object}  ErrorResponse
+// @Failure      500  {object}  ErrorResponse
+// @Router       /api/subscribe [post]
 func (h *Handler) Subscribe(w http.ResponseWriter, r *http.Request) {
 	var req SubscribeRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -50,6 +64,16 @@ func (h *Handler) Subscribe(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Successfully subscribed. Please check your email for confirmation."))
 }
 
+// GetAll godoc
+// @Summary      Get all subscriptions for an email
+// @Description  Retrieves all subscriptions for a given email address.
+// @Tags         subscription
+// @Produce      json
+// @Param        email  query  string  true  "Email address"
+// @Success      200  {object}  []SubscriptionDTO
+// @Failure      400  {object}  ErrorResponse
+// @Failure      500  {object}  ErrorResponse
+// @Router       /api/subscriptions [get]
 func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request) {
 	email := r.URL.Query().Get("email")
 	if email == "" {
@@ -69,6 +93,16 @@ func (h *Handler) GetAll(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Confirm godoc
+// @Summary      Confirm subscription
+// @Description  Confirms a subscription using a token.
+// @Tags         subscription
+// @Produce      text/plain
+// @Param        token  query  string  true  "Subscription token"
+// @Success      200  {object}  string
+// @Failure      400  {object}  ErrorResponse
+// @Failure      500  {object}  ErrorResponse
+// @Router       /api/confirm [get]
 func (h *Handler) Confirm(w http.ResponseWriter, r *http.Request) {
 	token := r.URL.Query().Get("token")
 	if token == "" {
@@ -84,6 +118,16 @@ func (h *Handler) Confirm(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Subscription successfully confirmed!"))
 }
 
+// Unsubscribe godoc
+// @Summary      Unsubscribe from repository updates
+// @Description  Unsubscribes a user from receiving email notifications for a specific repository.
+// @Tags         subscription
+// @Produce      text/plain
+// @Param        token  query  string  true  "Subscription token"
+// @Success      200  {object}  string
+// @Failure      400  {object}  ErrorResponse
+// @Failure      500  {object}  ErrorResponse
+// @Router       /api/unsubscribe [get]
 func (h *Handler) Unsubscribe(w http.ResponseWriter, r *http.Request) {
 	token := r.URL.Query().Get("token")
 	if token == "" {

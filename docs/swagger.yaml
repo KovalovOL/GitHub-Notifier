@@ -1,0 +1,155 @@
+basePath: /api
+definitions:
+  subscription.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  subscription.SubscribeRequest:
+    properties:
+      email:
+        type: string
+      repo:
+        type: string
+    type: object
+  subscription.SubscribeResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  subscription.SubscriptionDTO:
+    properties:
+      is_confirmed:
+        type: boolean
+      last_checked:
+        type: string
+      last_tag:
+        type: string
+      repo_path:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: '[EMAIL_ADDRESS]'
+    name: Oleksandr
+  description: GitHub Notifier is a service that monitors GitHub repositories and
+    sends email notifications when new commits are pushed to the repositories.
+  termsOfService: http://swagger.io/terms/
+  title: GitHub Notifier API
+  version: "1.0"
+paths:
+  /api/confirm:
+    get:
+      description: Confirms a subscription using a token.
+      parameters:
+      - description: Subscription token
+        in: query
+        name: token
+        required: true
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/subscription.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/subscription.ErrorResponse'
+      summary: Confirm subscription
+      tags:
+      - subscription
+  /api/subscribe:
+    post:
+      description: Subscribes a user to receive email notifications for new commits
+        in a specific GitHub repository.
+      parameters:
+      - description: Subscription request
+        in: body
+        name: SubscribeRequest
+        required: true
+        schema:
+          $ref: '#/definitions/subscription.SubscribeRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/subscription.SubscribeResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/subscription.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/subscription.ErrorResponse'
+      summary: Subscribe to repository updates
+      tags:
+      - subscription
+  /api/subscriptions:
+    get:
+      description: Retrieves all subscriptions for a given email address.
+      parameters:
+      - description: Email address
+        in: query
+        name: email
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/subscription.SubscriptionDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/subscription.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/subscription.ErrorResponse'
+      summary: Get all subscriptions for an email
+      tags:
+      - subscription
+  /api/unsubscribe:
+    get:
+      description: Unsubscribes a user from receiving email notifications for a specific
+        repository.
+      parameters:
+      - description: Subscription token
+        in: query
+        name: token
+        required: true
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/subscription.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/subscription.ErrorResponse'
+      summary: Unsubscribe from repository updates
+      tags:
+      - subscription
+swagger: "2.0"
