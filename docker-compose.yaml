@@ -1,7 +1,7 @@
 services:
   db:
     image: postgres:15-alpine
-    container_name: ghn_postgres_db
+    container_name: ghn_postgres
     restart: always
     env_file:
       - .env
@@ -22,7 +22,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: github_notifier_api
+    container_name: gh_notifier
     restart: always
     env_file:
       - .env
