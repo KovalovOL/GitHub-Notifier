@@ -87,18 +87,13 @@ func (s *service) createSubscription(ctx context.Context, email, owner, repo, ta
 }
 
 func (s *service) ConfirmSubscription(ctx context.Context, token string) error {
-	_, err := s.repo.GetByToken(ctx, token)
+	sub, err := s.repo.GetByToken(ctx, token)
 	if err != nil {
 		return fmt.Errorf("invalid or expired confirmation token: %w", err)
 	}
 
 	if err := s.repo.Confirm(ctx, token); err != nil {
 		return fmt.Errorf("failed to confirm subscription: %w", err)
-	}
-
-	sub, err := s.repo.GetByToken(ctx, token)
-	if err != nil {
-		return fmt.Errorf("failed to get subscription: %w", err)
 	}
 
 	if err := s.notifier.SendSubscriptionSuccess(ctx, sub.Email, sub.Owner+"/"+sub.Repo); err != nil {

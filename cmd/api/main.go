@@ -32,9 +32,9 @@ func init() {
 // @termsOfService http://swagger.io/terms/
 
 // @contact.name   Oleksandr
-// @contact.email  [EMAIL_ADDRESS]
+// @contact.email  sasha.kovalov2008@gmail.com
 
-// @host      localhost:8080
+// @host      gh-notifier.online
 // @BasePath  /api
 
 func main() {
@@ -53,13 +53,13 @@ func main() {
 	}
 
 	ghClient := github.NewClient(config.GHToken)
-	emailNotifier := notifier.NewEmailNotifier(
+	emailNotifier := notifier.NewAsyncNotifier(notifier.NewEmailNotifier(
 		config.SMTPHost,
 		config.SMTPPort,
 		config.SMTPUser,
 		config.SMTPPass,
 		config.SMTPFrom,
-	)
+	))
 	repo := subscription.NewRepository(pool)
 	subService := subscription.NewService(repo, ghClient, emailNotifier)
 	subHandler := subscription.NewHandler(subService)
